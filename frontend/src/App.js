@@ -1,5 +1,5 @@
 import './App.css'
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 
 // CSRF Token Retrieval
 function getCSRFToken() {
@@ -97,7 +97,7 @@ function Step2Employment({ formData, setFormData, nextStep, prevStep }) {
         }
         
         // Allow letters, spaces, apostrophes, hyphens, periods, ampersands, and commas
-        const validEmploymentRegex = /^[a-zA-Z\s'\-\.&,]+$/;
+        const validEmploymentRegex = /^[a-zA-Z\s'-.&]+$/;
         
         if (!validEmploymentRegex.test(employment)) {
             setEmploymentError('Please enter a valid employment');
@@ -360,7 +360,7 @@ function Step4BankingInfo({ formData, setFormData, prevStep, nextStep }) {
         }
         
         // Allow letters, spaces, apostrophes, hyphens, periods, and ampersands
-        const validBankNameRegex = /^[a-zA-Z\s'\-\.&]+$/;
+        const validBankNameRegex = /^[a-zA-Z\s'-.&]+$/;
         
         if (!validBankNameRegex.test(bankName)) {
             setBankNameError('Please enter a valid bank name');
