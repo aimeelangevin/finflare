@@ -1,0 +1,149 @@
+{% extends 'finflare/base.html' %}
+
+    {% block header %}
+    <div class="flex justify-between items-center px-4">
+        <h2 class="text-2xl font-monaco text-finflare-blue">Spending</h2>
+        <a href="{% url 'dashboard' %}" class="text-finflare-blue hover:text-finflare-green transition-colors">Back to Dashboard</a>
+    </div>
+    {% endblock %}
+
+    {% block content %}
+
+
+    <!--Charts!  -->
+     <div class="chart-grid">
+        <div class="chart-container">
+            <canvas id="barChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="pieChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="doughnutChart"></canvas>
+        </div>
+    </div>
+
+    <!-- form! -->
+    <div class="bg-white shadow-md rounded-md overflow-hidden">
+        <div class="px-6 py-4">
+            <h1 class="text-xl font-semibold text-gray-800 mb-4">Add New Spending</h1>
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="space-y-1">
+                        <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <div class="text-red-500 text-sm">{{ field.errors }}</div>
+                        {% endif %}
+                        {% if field.help_text %}
+                            <p class="text-gray-500 text-xs">{{ field.help_text }}</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                <button type="submit" class="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Add Spending</button>
+            </form>
+            <div class="mt-4">
+            </div>
+        </div>
+    </div>
+
+    
+    <!-- total table! -->
+    <h2 class="mt-4 text-xl font-semibold mb-3 text-center">Spending Summary by Type</h2>
+    <div class="flex justify-center">
+        <div class="w-3/4">
+            {% if spending_type_totals %}
+                <table class="table-auto shadow-md rounded-md w-full">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-4 py-2 text-left">Spending Type</th>
+                            <th class="px-4 py-2 text-left">Total Spending</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in spending_type_totals %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="border px-4 py-2">{{ item.spending_type }}</td>
+                                <td class="border px-4 py-2">${{ item.total_spent }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot class="bg-gray-100 font-semibold">
+                        <tr>
+                            <th class="px-4 py-2 text-left">Overall Total</th>
+                            <th class="px-4 py-2 text-left">${{ overall_spending }}</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            {% else %}
+                <p class="text-gray-600 text-center">No spending data available.</p>
+            {% endif %}
+        </div>
+    </div>
+    <div class="bg-white shadow-md rounded-md overflow-hidden">
+        <div class="p-6">
+            <h1 class="text-2xl font-semibold text-gray-800 mb-4">My Spending Entries</h1>
+
+            {% if spending_entries %}
+                <div class="overflow-x-auto">
+                    <table class="min-w-full leading-normal">
+                        <thead>
+                            <tr>
+                                <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Category
+                                </th>
+                                <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Amount
+                                </th>
+                                <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Location
+                                </th>
+                                <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Specific Category
+                                </th>
+                                <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Transaction Date
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entry in spending_entries %}
+                                <tr>
+                                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                        <p class="text-gray-900 whitespace-no-wrap">{{ entry.get_spending_type_display }}</p>
+                                    </td>
+                                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                        <p class="text-gray-900 whitespace-no-wrap">${{ entry.amt }}</p>
+                                    </td>
+                                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                        <p class="text-gray-900 whitespace-no-wrap">{{ entry.location }}</p>
+                                    </td>
+                                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                        <p class="text-gray-900 whitespace-no-wrap">{{ entry.category }}</p>
+                                    </td>
+                                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                        <p class="text-gray-900 whitespace-no-wrap">{{ entry.transaction_date }}</p>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-gray-600">No spending entries yet.</p>
+            {% endif %}
+        </div>
+    </div>
+    
+
+    
+
+
+
+    {% load static %}
+    <link  rel="stylesheet" href="{% static 'finflare/base.css'%}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{% static 'finflare/acquisitions.js' %}"></script>
+  
+{% endblock %}

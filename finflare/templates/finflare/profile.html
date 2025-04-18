@@ -1,0 +1,270 @@
+{% extends 'finflare/base.html' %}
+{% load static %}
+
+{% block header %}
+<div class="flex justify-between items-center px-4">
+    <h2 class="text-2xl font-monaco text-finflare-blue">Profile</h2>
+    <a href="{% url 'dashboard' %}" class="text-finflare-blue hover:text-finflare-green transition-colors">Back to Dashboard</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+    <h1 class="text-3xl font-bold text-finflare-blue mb-6 font-monaco">Your Profile</h1>
+    
+    <!-- Personal Information Card -->
+    <div class="bg-white rounded-lg shadow-md mb-6 overflow-hidden">
+        <div class="bg-gray-50 px-6 py-4 flex justify-between items-center border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-800">Personal Information</h2>
+            <button id="togglePersonalForm" class="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-finflare-blue hover:bg-finflare-green/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-finflare-blue">
+                Edit
+            </button>
+        </div>
+        <div class="p-6">
+            <div id="personalInfoView" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <p class="mb-3"><span class="font-semibold text-gray-700">Name:</span> <span class="text-gray-800">{{ profile.name }}</span></p>
+                    <p class="mb-3"><span class="font-semibold text-gray-700">Age:</span> <span class="text-gray-800">{{ profile.age }}</span></p>
+                    <p class="mb-3"><span class="font-semibold text-gray-700">Current Employment:</span> <span class="text-gray-800">{{ profile.current_employment }}</span></p>
+                </div>
+                <div>
+                    <p class="mb-3"><span class="font-semibold text-gray-700">Income:</span> <span class="text-gray-800">${{ profile.income|floatformat:2 }}</span></p>
+                    <p class="mb-3"><span class="font-semibold text-gray-700">Savings:</span> <span class="text-gray-800">${{ profile.savings|floatformat:2 }}</span></p>
+                    <p class="mb-3"><span class="font-semibold text-gray-700">Retirement Date:</span> <span class="text-gray-800">{{ profile.retirement_date|date:"F d, Y"|default:"Not set" }}</span></p>
+                </div>
+            </div>
+            
+            <div id="personalInfoForm" class="hidden mt-4">
+                <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                    <form method="post" id="profileForm" class="space-y-6">
+                        {% csrf_token %}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="{{ profile_form.name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                                    <input type="text" name="{{ profile_form.name.html_name }}" id="{{ profile_form.name.id_for_label }}"
+                                           value="{{ profile_form.name.value|default:'' }}"
+                                           class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-finflare-blue focus:outline-none focus:ring-1 focus:ring-finflare-blue sm:text-sm"
+                                           placeholder="Enter your name">
+                                    {% if profile_form.name.errors %}
+                                        <div class="text-red-600 text-sm mt-1">{{ profile_form.name.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <label for="{{ profile_form.age.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Age</label>
+                                    <input type="number" name="{{ profile_form.age.html_name }}" id="{{ profile_form.age.id_for_label }}"
+                                           value="{{ profile_form.age.value|default:'' }}"
+                                           min="16" max="100"
+                                           class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-finflare-blue focus:outline-none focus:ring-1 focus:ring-finflare-blue sm:text-sm"
+                                           placeholder="Enter your age">
+                                    {% if profile_form.age.errors %}
+                                        <div class="text-red-600 text-sm mt-1">{{ profile_form.age.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <label for="{{ profile_form.current_employment.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Current Employment</label>
+                                    <input type="text" name="{{ profile_form.current_employment.html_name }}" id="{{ profile_form.current_employment.id_for_label }}"
+                                           value="{{ profile_form.current_employment.value|default:'' }}"
+                                           class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-finflare-blue focus:outline-none focus:ring-1 focus:ring-finflare-blue sm:text-sm"
+                                           placeholder="Enter your current employment">
+                                    {% if profile_form.current_employment.errors %}
+                                        <div class="text-red-600 text-sm mt-1">{{ profile_form.current_employment.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="{{ profile_form.income.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Income</label>
+                                    <div class="relative mt-1 rounded-md shadow-sm">
+                                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                            <span class="text-gray-500 sm:text-sm">$</span>
+                                        </div>
+                                        <input type="number" name="{{ profile_form.income.html_name }}" id="{{ profile_form.income.id_for_label }}"
+                                               value="{{ profile_form.income.value|default:'' }}"
+                                               step="0.01" min="0"
+                                               class="block w-full rounded-md border border-gray-300 pl-7 pr-12 py-2 focus:border-finflare-blue focus:outline-none focus:ring-1 focus:ring-finflare-blue sm:text-sm"
+                                               placeholder="0.00">
+                                    </div>
+                                    {% if profile_form.income.errors %}
+                                        <div class="text-red-600 text-sm mt-1">{{ profile_form.income.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <label for="{{ profile_form.savings.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Savings</label>
+                                    <div class="relative mt-1 rounded-md shadow-sm">
+                                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                            <span class="text-gray-500 sm:text-sm">$</span>
+                                        </div>
+                                        <input type="number" name="{{ profile_form.savings.html_name }}" id="{{ profile_form.savings.id_for_label }}"
+                                               value="{{ profile_form.savings.value|default:'' }}"
+                                               step="0.01" min="0"
+                                               class="block w-full rounded-md border border-gray-300 pl-7 pr-12 py-2 focus:border-finflare-blue focus:outline-none focus:ring-1 focus:ring-finflare-blue sm:text-sm"
+                                               placeholder="0.00">
+                                    </div>
+                                    {% if profile_form.savings.errors %}
+                                        <div class="text-red-600 text-sm mt-1">{{ profile_form.savings.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <label for="{{ profile_form.retirement_date.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Retirement Date</label>
+                                    <input type="date" name="{{ profile_form.retirement_date.html_name }}" id="{{ profile_form.retirement_date.id_for_label }}"
+                                           value="{{ profile_form.retirement_date.value|date:'Y-m-d'|default:'' }}"
+                                           class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-finflare-blue focus:outline-none focus:ring-1 focus:ring-finflare-blue sm:text-sm">
+                                    {% if profile_form.retirement_date.errors %}
+                                        <div class="text-red-600 text-sm mt-1">{{ profile_form.retirement_date.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pt-4 flex space-x-4">
+                            <button type="button" id="cancelPersonalEdit" class="flex-1 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-finflare-blue bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-finflare-blue border-finflare-blue">
+                                Cancel
+                            </button>
+                            <button type="submit" class="flex-1 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-finflare-blue hover:bg-finflare-green/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-finflare-blue">
+                                Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Banking Information Card -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="bg-gray-50 px-6 py-4 flex justify-between items-center border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-800">Banking Information</h2>
+            <button id="toggleBankingForm" class="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-finflare-blue hover:bg-finflare-green/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-finflare-blue">
+                Edit
+            </button>
+        </div>
+        <div class="p-6">
+            <div id="bankingInfoView" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% if banking_info %}
+                    <div>
+                        <p class="mb-3"><span class="font-semibold text-gray-700">Bank Name:</span> <span class="text-gray-800">{{ banking_info.bank_name }}</span></p>
+                        <p class="mb-3"><span class="font-semibold text-gray-700">Account Number:</span> <span class="text-gray-800">{{ banking_info.account_number }}</span></p>
+                    </div>
+                    <div>
+                        <p class="mb-3"><span class="font-semibold text-gray-700">Balance:</span> <span class="text-gray-800">${{ banking_info.balance|floatformat:2 }}</span></p>
+                    </div>
+                {% else %}
+                    <p class="text-gray-600">No banking information available.</p>
+                {% endif %}
+            </div>
+            
+            <div id="bankingInfoForm" class="hidden mt-4">
+                <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                    <form method="post" id="bankingForm" class="space-y-6">
+                        {% csrf_token %}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="{{ banking_form.bank_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Bank Name</label>
+                                    <input type="text" name="{{ banking_form.bank_name.html_name }}" id="{{ banking_form.bank_name.id_for_label }}"
+                                           value="{{ banking_form.bank_name.value|default:'' }}"
+                                           class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-finflare-blue focus:outline-none focus:ring-1 focus:ring-finflare-blue sm:text-sm"
+                                           placeholder="Enter bank name">
+                                    {% if banking_form.bank_name.errors %}
+                                        <div class="text-red-600 text-sm mt-1">{{ banking_form.bank_name.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <label for="{{ banking_form.account_number.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Account Number</label>
+                                    <input type="text" name="{{ banking_form.account_number.html_name }}" id="{{ banking_form.account_number.id_for_label }}"
+                                           value="{{ banking_form.account_number.value|default:'' }}"
+                                           class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-finflare-blue focus:outline-none focus:ring-1 focus:ring-finflare-blue sm:text-sm"
+                                           placeholder="Enter account number">
+                                    {% if banking_form.account_number.errors %}
+                                        <div class="text-red-600 text-sm mt-1">{{ banking_form.account_number.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="{{ banking_form.balance.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Balance</label>
+                                    <div class="relative mt-1 rounded-md shadow-sm">
+                                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                            <span class="text-gray-500 sm:text-sm">$</span>
+                                        </div>
+                                        <input type="number" name="{{ banking_form.balance.html_name }}" id="{{ banking_form.balance.id_for_label }}"
+                                               value="{{ banking_form.balance.value|default:'' }}"
+                                               step="0.01" min="0"
+                                               class="block w-full rounded-md border border-gray-300 pl-7 pr-12 py-2 focus:border-finflare-blue focus:outline-none focus:ring-1 focus:ring-finflare-blue sm:text-sm"
+                                               placeholder="0.00">
+                                    </div>
+                                    {% if banking_form.balance.errors %}
+                                        <div class="text-red-600 text-sm mt-1">{{ banking_form.balance.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pt-4 flex space-x-4">
+                            <button type="button" id="cancelBankingEdit" class="flex-1 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-finflare-blue bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-finflare-blue border-finflare-blue">
+                                Cancel
+                            </button>
+                            <button type="submit" class="flex-1 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-finflare-blue hover:bg-finflare-green/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-finflare-blue">
+                                Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Personal Information Form Toggle
+        const togglePersonalForm = document.getElementById('togglePersonalForm');
+        const personalInfoView = document.getElementById('personalInfoView');
+        const personalInfoForm = document.getElementById('personalInfoForm');
+        const cancelPersonalEdit = document.getElementById('cancelPersonalEdit');
+        
+        togglePersonalForm.addEventListener('click', function() {
+            personalInfoView.classList.add('hidden');
+            personalInfoForm.classList.remove('hidden');
+            togglePersonalForm.textContent = 'Cancel';
+            togglePersonalForm.id = 'cancelPersonalEdit';
+        });
+        
+        cancelPersonalEdit.addEventListener('click', function() {
+            personalInfoForm.classList.add('hidden');
+            personalInfoView.classList.remove('hidden');
+            togglePersonalForm.textContent = 'Edit';
+            togglePersonalForm.id = 'togglePersonalForm';
+        });
+        
+        // Banking Information Form Toggle
+        const toggleBankingForm = document.getElementById('toggleBankingForm');
+        const bankingInfoView = document.getElementById('bankingInfoView');
+        const bankingInfoForm = document.getElementById('bankingInfoForm');
+        const cancelBankingEdit = document.getElementById('cancelBankingEdit');
+        
+        toggleBankingForm.addEventListener('click', function() {
+            bankingInfoView.classList.add('hidden');
+            bankingInfoForm.classList.remove('hidden');
+            toggleBankingForm.textContent = 'Cancel';
+            toggleBankingForm.id = 'cancelBankingEdit';
+        });
+        
+        cancelBankingEdit.addEventListener('click', function() {
+            bankingInfoForm.classList.add('hidden');
+            bankingInfoView.classList.remove('hidden');
+            toggleBankingForm.textContent = 'Edit';
+            toggleBankingForm.id = 'toggleBankingForm';
+        });
+        
+        // Form Submission
+        const profileForm = document.getElementById('profileForm');
+        const bankingForm = document.getElementById('bankingForm');
+        
+        profileForm.addEventListener('submit', function(e) {
+        });
+        
+        bankingForm.addEventListener('submit', function(e) {
+        });
+    });
+</script>
+{% endblock %}

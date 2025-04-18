@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: finflare
+    env: python
+    buildCommand: pip install -r requirements.txt && cd frontend && npm install && npm run build
+    startCommand: gunicorn finflare.wsgi:application
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DJANGO_SETTINGS_MODULE
+        value: finflare.settings
+      - key: DATABASE_URL
+        fromDatabase:
+          name: finflare-db
+          property: connectionString
+
+databases:
+  - name: finflare-db
+    databaseName: finflare
+    user: finflare
+    plan: free 

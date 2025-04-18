@@ -1,0 +1,47 @@
+{% extends "finflare/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="header-div">
+    <h1 class = "text-[36px] font-bold">Welcome, {{ profile.name }}</h1>
+</div>
+
+<div class="grid grid-cols-2 grid-rows-2 gap-4 p-10">
+
+    <!-- Finance Articles Button -->
+    <a href="{% url 'articles' %}" class="relative group">
+        <img src="{% static 'images/article.jpg' %}" alt="Finance Articles" class="w-full h-40 object-cover rounded-lg">
+        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center rounded-lg hover:bg-opacity-80">
+            <span class="text-white text-4xl font-bold">Finance Articles</span>
+        </div>
+    </a>
+
+    <!-- Tips Button -->
+    <a href="{% url 'tips' %}" class="relative group">
+        <img src="{% static 'images/tips.jpg' %}" alt="Finance Articles" class="w-full h-40 object-cover rounded-lg">
+        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center rounded-lg group-hover:bg-opacity-80">
+            <span class="text-white text-4xl font-bold">Tips</span>
+        </div>
+    </a>
+
+    <!-- Investment Suggestions Button -->
+    <a href="{% url 'investment_suggestion' %}" class="relative group">
+        <img src="{% static 'images/investment_suggest.jpg' %}" alt="Finance Articles" class="w-full h-40 object-cover rounded-lg">
+        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center rounded-lg group-hover:bg-opacity-80">
+            <span class="text-white text-4xl font-bold">Investment Suggestions</span>
+        </div>
+    </a>
+
+    <!-- Spending Breakdown Button -->
+    <a href="{% url 'spending' %}" class="relative group">
+        <img src="{% static 'images/spending.jpg' %}" alt="Finance Articles" class="w-full h-40 object-cover rounded-lg">
+        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center rounded-lg group-hover:bg-opacity-80">
+            <span class="text-white text-4xl font-bold">Spending Breakdown</span>
+        </div>
+    </a>
+
+</div>
+{% endblock %}
+
+
+

@@ -1,0 +1,238 @@
+{% extends "finflare/base.html" %}
+
+{% block header %}
+<div class="flex justify-between items-center px-4">
+    <h2 class="text-2xl font-monaco text-finflare-blue">Investments</h2>
+    <a href="{% url 'dashboard' %}" class="text-finflare-blue hover:text-finflare-green transition-colors">Back to Dashboard</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto mt-8 p-6">
+    <div class="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+        <h1 class="text-2xl font-bold text-finflare-blue mb-6 font-monaco">Investment Suggestions</h1>
+        
+        {% if success %}
+            <div class="space-y-6">
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-3">Your Preferences</h2>
+                    <ul class="grid grid-cols-2 gap-4">
+                        <li><strong>Investment Amount:</strong> {{ investment_amount }}</li>
+                        <li><strong>Risk Level:</strong> {{ risk_level|title }}</li>
+                        <li><strong>Investment Type:</strong> {{ investment_type|title }}</li>
+                        <li><strong>Market Sector:</strong> {{ market_sector|title }}</li>
+                        <li><strong>Investment Horizon:</strong> {{ investment_horizon|title }}</li>
+                    </ul>
+                </div>
+
+                <div id="suggestions-container">
+                    {% if suggestions %}
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Symbol</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Change</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Change %</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Volume</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quick Tip</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    {% for suggestion in suggestions %}
+                                        <tr class="hover:bg-gray-50">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ suggestion.symbol }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ suggestion.name }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${{ suggestion.price|floatformat:2 }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${{ suggestion.change|floatformat:2 }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ suggestion.change_percent|floatformat:2 }}%</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ suggestion.volume }}</td>
+                                            <td class="px-6 py-4 text-sm text-gray-500">
+                                                {% if suggestion.change_percent > 5 %}
+                                                    <span class="text-green-600">Strong momentum</span> - Consider taking profits if you're up
+                                                {% elif suggestion.change_percent < -5 %}
+                                                    <span class="text-red-600">Significant drop</span> - Could be a buying opportunity
+                                                {% elif suggestion.volume > 1000000 %}
+                                                    <span class="text-blue-600">High volume</span> - Good liquidity for trading
+                                                {% elif suggestion.price < 50 %}
+                                                    <span class="text-purple-600">Low price point</span> - Good for starting small positions
+                                                {% else %}
+                                                    <span class="text-gray-600">Stable performance</span> - Consider dollar-cost averaging
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-8 bg-gray-50 rounded-lg p-6">
+                            <h4 class="text-xl font-semibold text-gray-800 mb-4">Next Steps</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h5 class="font-medium text-gray-700 mb-2">Investment Type Specific</h5>
+                                    <ul class="list-disc list-inside space-y-2 text-gray-600">
+                                        {% if investment_type == 'stocks' %}
+                                            <li>Research company fundamentals and recent news</li>
+                                            <li>Check the company's financial statements and earnings reports</li>
+                                        {% elif investment_type == 'etfs' %}
+                                            <li>Compare expense ratios and fund performance</li>
+                                            <li>Review the fund's holdings and sector allocation</li>
+                                        {% elif investment_type == 'mutual_funds' %}
+                                            <li>Check minimum investment requirements</li>
+                                            <li>Review fund manager's track record</li>
+                                        {% elif investment_type == 'bonds' %}
+                                            <li>Research bond ratings and yield</li>
+                                            <li>Consider bond maturity dates</li>
+                                        {% else %}
+                                            <li>Review fund prospectus and holdings</li>
+                                            <li>Compare performance across different investment types</li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+
+                                <div>
+                                    <h5 class="font-medium text-gray-700 mb-2">Risk Level Specific</h5>
+                                    <ul class="list-disc list-inside space-y-2 text-gray-600">
+                                        {% if risk_level == 'low' %}
+                                            <li>Focus on stable, established investments</li>
+                                            <li>Consider dividend-paying stocks or bonds</li>
+                                        {% elif risk_level == 'medium' %}
+                                            <li>Balance between growth and stability</li>
+                                            <li>Consider a mix of different risk levels</li>
+                                        {% else %}
+                                            <li>Research thoroughly before investing</li>
+                                            <li>Consider diversifying across multiple investments</li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+
+                                <div>
+                                    <h5 class="font-medium text-gray-700 mb-2">Market Sector Specific</h5>
+                                    <ul class="list-disc list-inside space-y-2 text-gray-600">
+                                        {% if market_sector == 'technology' %}
+                                            <li>Stay updated on tech industry trends</li>
+                                            <li>Consider both established and emerging tech companies</li>
+                                        {% elif market_sector == 'healthcare' %}
+                                            <li>Research healthcare regulations and policies</li>
+                                            <li>Consider both medical and biotech companies</li>
+                                        {% elif market_sector == 'finance' %}
+                                            <li>Monitor interest rates and economic indicators</li>
+                                            <li>Consider both traditional and fintech companies</li>
+                                        {% elif market_sector == 'energy' %}
+                                            <li>Research renewable energy trends</li>
+                                            <li>Consider both traditional and alternative energy</li>
+                                        {% elif market_sector == 'consumer' %}
+                                            <li>Monitor consumer spending trends</li>
+                                            <li>Consider both retail and e-commerce companies</li>
+                                        {% elif market_sector == 'industrial' %}
+                                            <li>Research global manufacturing trends</li>
+                                            <li>Consider infrastructure and defense companies</li>
+                                        {% elif market_sector == 'real_estate' %}
+                                            <li>Research local real estate market conditions</li>
+                                            <li>Consider both REITs and property management companies</li>
+                                        {% else %}
+                                            <li>Research across multiple sectors for diversification</li>
+                                            <li>Consider sector-specific ETFs for broad exposure</li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+
+                                <div>
+                                    <h5 class="font-medium text-gray-700 mb-2">General Steps</h5>
+                                    <ul class="list-disc list-inside space-y-2 text-gray-600">
+                                        <li>Open a brokerage account if you don't have one</li>
+                                        <li>Set up automatic investments if possible</li>
+                                        <li>Monitor your investments regularly</li>
+                                        <li>Consult with a financial advisor for personalized advice</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <a href="{% url 'add_investment' %}" class="bg-finflare-blue text-white px-4 py-2 rounded hover:bg-finflare-green/90 transition-colors">
+                                Add an Investment to Your Profile
+                            </a>
+                        </div>
+                    {% else %}
+                        <p class="text-gray-600">No suggestions found. Please try different criteria.</p>
+                    {% endif %}
+                </div>
+            </div>
+        {% else %}
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                {% if form.errors %}
+                    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+                        <p>Please correct the errors below.</p>
+                    </div>
+                {% endif %}
+
+                <div class="space-y-4">
+                    <div>
+                        <label for="{{ form.investment_amount.id_for_label }}" class="block text-sm font-medium text-gray-700">Investment Amount</label>
+                        {{ form.investment_amount }}
+                        {% if form.investment_amount.errors %}
+                            <div class="text-red-600 text-sm mt-1">
+                                {{ form.investment_amount.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.risk_level.id_for_label }}" class="block text-sm font-medium text-gray-700">Risk Level</label>
+                        {{ form.risk_level }}
+                        {% if form.risk_level.errors %}
+                            <div class="text-red-600 text-sm mt-1">
+                                {{ form.risk_level.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.investment_type.id_for_label }}" class="block text-sm font-medium text-gray-700">Investment Type</label>
+                        {{ form.investment_type }}
+                        {% if form.investment_type.errors %}
+                            <div class="text-red-600 text-sm mt-1">
+                                {{ form.investment_type.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.market_sector.id_for_label }}" class="block text-sm font-medium text-gray-700">Market Sector</label>
+                        {{ form.market_sector }}
+                        {% if form.market_sector.errors %}
+                            <div class="text-red-600 text-sm mt-1">
+                                {{ form.market_sector.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.investment_horizon.id_for_label }}" class="block text-sm font-medium text-gray-700">Investment Horizon</label>
+                        {{ form.investment_horizon }}
+                        {% if form.investment_horizon.errors %}
+                            <div class="text-red-600 text-sm mt-1">
+                                {{ form.investment_horizon.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="pt-4 flex space-x-4">
+                    <a href="{% url 'investment_overview' %}" class="flex-1 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-finflare-blue bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-finflare-blue border-finflare-blue text-center">
+                        Cancel
+                    </a>
+                    <button type="submit" class="flex-1 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-finflare-blue hover:bg-finflare-green/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-finflare-blue">
+                        Get Investment Suggestions
+                    </button>
+                </div>
+            </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

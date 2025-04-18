@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <title>Finflare</title>
+        {% load static %}
+
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="{% static 'finflare/base.css' %}">
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            'finflare': {
+                                'blue': '#1165C1',
+                                'green': '#28a61b',
+                            }
+                        },
+                        fontFamily: {
+                            'monaco': ['Monaco', 'monospace']
+                        }
+                    }
+                }
+            }
+        </script>
+    </head>
+    <body class="bg-gray-50">
+        <div class="m-[0.30em] p-[0.25em] bg-white/55 rounded-[2em] shadow-md border border-gray-200" id="id_header_div">
+            <div class="flex justify-between items-center">
+                <h1 id="id_site_name" class="m-[0.5em] p-[0.25em] font-monaco text-finflare-blue text-3xl font-bold">Finflare</h1>
+                {% if user.is_authenticated %}
+                <a href="{% url 'logout' %}" class="m-[0.5em] p-[0.5em] bg-finflare-blue text-white rounded-md hover:bg-opacity-90 transition-colors shadow-sm">Logout</a>
+                {% endif %}
+            </div>
+            {% block header %}
+            {% endblock %}
+        </div>
+        {% block content %}
+        {% endblock %}
+    </body>
+</html> 
+

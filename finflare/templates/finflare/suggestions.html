@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Suggestion Box</title>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+    <form method="post" class="bg-white p-6 rounded shadow-md w-96">
+        {% csrf_token %}
+        <h1 class="text-xl font-bold">Submit a Question or Suggestion</h1>
+        <textarea name="suggestion" rows="4" class="w-full p-2 border border-gray-300 rounded" placeholder="Your suggestion..."></textarea>
+        <button type="submit" class=" w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Submit</button>
+    </form>
+</body>
+</html>

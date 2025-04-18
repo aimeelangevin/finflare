@@ -1,0 +1,91 @@
+{% extends "finflare/base.html" %}
+
+{% block header %}
+<div class="flex justify-between items-center px-4">
+    <h2 class="text-2xl font-monaco text-finflare-blue">Investment Overview</h2>
+    <a href="{% url 'dashboard' %}" class="text-finflare-blue hover:text-finflare-green transition-colors">Back to Dashboard</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <a href="{% url 'add_investment' %}" class="bg-finflare-blue hover:bg-finflare-green/90 text-white font-bold py-2 px-4 rounded">
+            Add New Investment
+        </a>
+    </div>
+
+    {% if investments %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for investment in investments %}
+                <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow duration-300">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <h2 class="text-xl font-semibold text-gray-800">{{ investment.investment_name|default:"Unnamed Investment" }}</h2>
+                            <span class="px-3 py-1 text-sm font-medium rounded-full 
+                                {% if investment.investment_type == 'stocks' %}bg-blue-100 text-blue-800
+                                {% elif investment.investment_type == 'bonds' %}bg-green-100 text-green-800
+                                {% elif investment.investment_type == 'mutual_funds' %}bg-purple-100 text-purple-800
+                                {% elif investment.investment_type == 'real_estate' %}bg-yellow-100 text-yellow-800
+                                {% elif investment.investment_type == 'crypto' %}bg-orange-100 text-orange-800
+                                {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ investment.get_investment_type_display|default:"Not Set" }}
+                            </span>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Amount:</span>
+                                <span class="font-medium">${{ investment.user_amt|default:"0.00"|floatformat:2 }}</span>
+                            </div>
+                            
+                            {% if investment.roi %}
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">ROI:</span>
+                                <span class="font-medium {% if investment.roi > 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                                    {{ investment.roi|floatformat:2 }}%
+                                </span>
+                            </div>
+                            {% endif %}
+                            
+                            {% if investment.growth_rate %}
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Growth Rate:</span>
+                                <span class="font-medium {% if investment.growth_rate > 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                                    {{ investment.growth_rate|floatformat:2 }}%
+                                </span>
+                            </div>
+                            {% endif %}
+                            
+                            {% if investment.risk_level %}
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Risk Level:</span>
+                                <span class="font-medium">
+                                    {% if investment.risk_level == 'low' %}
+                                        <span class="text-green-600">Low</span>
+                                    {% elif investment.risk_level == 'medium' %}
+                                        <span class="text-yellow-600">Medium</span>
+                                    {% elif investment.risk_level == 'high' %}
+                                        <span class="text-red-600">High</span>
+                                    {% else %}
+                                        {{ investment.risk_level }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="bg-white rounded-lg shadow-md p-8 text-center">
+            <h3 class="text-xl font-medium text-gray-700 mb-2">No Investments Yet</h3>
+            <p class="text-gray-500 mb-4">You haven't added any investments to your portfolio.</p>
+            <a href="{% url 'add_investment' %}" class="inline-block bg-finflare-blue hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Add Your First Investment
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 
