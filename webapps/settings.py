@@ -68,7 +68,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'frontend'),
+            os.path.join(BASE_DIR, 'frontend/build'),  # Point directly to the build directory
             os.path.join(BASE_DIR, 'finflare/templates'),
         ],
         'APP_DIRS': True,
@@ -137,7 +137,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'frontend/build/static')
+    os.path.join(BASE_DIR, 'frontend/build/static'),  # Point directly to the static directory in build
 ]
 
 # Enable WhiteNoise compression and caching

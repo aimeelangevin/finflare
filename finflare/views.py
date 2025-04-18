@@ -288,7 +288,7 @@ def onboarding(request):
         return redirect('dashboard')
     
     # For GET requests, serve the React application's index.html
-    return render(request, 'build/index.html', {})
+    return render(request, 'index.html', {})
 
 def get_user(request):
     if request.user.is_authenticated:
