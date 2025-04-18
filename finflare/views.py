@@ -28,12 +28,11 @@ load_dotenv()
 # Get API key from environment variables
 ALPHA_VANTAGE_API_KEY = os.getenv('ALPHA_VANTAGE_API_KEY')
 
-# Debug logging for OAuth credentials - only if DEBUG is True
-if settings.DEBUG:
-    print("Google OAuth2 Key:", os.getenv('GOOGLE_OAUTH2_KEY', 'Not set'))
-    print("Google OAuth2 Secret:", os.getenv('GOOGLE_OAUTH2_SECRET', 'Not set'))
-    print("GitHub Key:", os.getenv('GITHUB_KEY', 'Not set'))
-    print("GitHub Secret:", os.getenv('GITHUB_SECRET', 'Not set'))
+# Debug logging for OAuth credentials
+print("Google OAuth2 Key:", os.getenv('GOOGLE_OAUTH2_KEY'))
+print("Google OAuth2 Secret:", os.getenv('GOOGLE_OAUTH2_SECRET'))
+print("GitHub Key:", os.getenv('GITHUB_KEY'))
+print("GitHub Secret:", os.getenv('GITHUB_SECRET'))
 
 def profile_required(view_func):
     @wraps(view_func)
@@ -87,14 +86,20 @@ def redirect_based_on_profile(backend, user, response, *args, **kwargs):
         return redirect('onboarding')
 
 def loginAction(request):
+    # Add debug logging
+    print("Login action called")
+    print("User authenticated:", request.user.is_authenticated)
+    
     # If user is already logged in, redirect them appropriately
     if request.user.is_authenticated:
         try:
             profile = Profile.objects.get(user=request.user)
+            print("Profile found:", profile.is_complete)
             if not profile.is_complete:
                 return redirect('onboarding')
             return redirect('dashboard')
         except Profile.DoesNotExist:
+            print("Profile does not exist, creating new profile")
             # Create a new profile for the user with default values
             Profile.objects.create(
                 user=request.user,
@@ -107,29 +112,29 @@ def loginAction(request):
                 is_complete=False
             )
             return redirect('onboarding')
-
+    
     context = {}
-
+    
     # Just display the registration form if this is a GET request.
     if request.method == 'GET':
-        context= {
-        "form" : LoginForm(),
-        "pageName": "Login",
+        context = {
+            "form": LoginForm(),
+            "pageName": "Login",
         }
         
         return render(request, 'finflare/start.html', context)
-
+    
     # Creates a bound form from the request POST parameters
     form = LoginForm(request.POST)
-
+    
     # Validates the form.
     if not form.is_valid():
         context['form'] = form
         return render(request, 'finflare/start.html', context)
-
+    
     new_user = authenticate(username=form.cleaned_data['username'],
                             password=form.cleaned_data['password'])
-
+    
     login(request, new_user)
     return redirect("dashboard")
 

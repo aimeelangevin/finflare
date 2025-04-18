@@ -67,7 +67,10 @@ ROOT_URLCONF = 'webapps.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'frontend')],  # Add React build directory
+        'DIRS': [
+            os.path.join(BASE_DIR, 'frontend'),
+            os.path.join(BASE_DIR, 'finflare/templates'),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
