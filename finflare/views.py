@@ -28,11 +28,12 @@ load_dotenv()
 # Get API key from environment variables
 ALPHA_VANTAGE_API_KEY = os.getenv('ALPHA_VANTAGE_API_KEY')
 
-# Debug logging for OAuth credentials
-print("Google OAuth2 Key:", os.getenv('GOOGLE_OAUTH2_KEY'))
-print("Google OAuth2 Secret:", os.getenv('GOOGLE_OAUTH2_SECRET'))
-print("GitHub Key:", os.getenv('GITHUB_KEY'))
-print("GitHub Secret:", os.getenv('GITHUB_SECRET'))
+# Debug logging for OAuth credentials - only if DEBUG is True
+if settings.DEBUG:
+    print("Google OAuth2 Key:", os.getenv('GOOGLE_OAUTH2_KEY', 'Not set'))
+    print("Google OAuth2 Secret:", os.getenv('GOOGLE_OAUTH2_SECRET', 'Not set'))
+    print("GitHub Key:", os.getenv('GITHUB_KEY', 'Not set'))
+    print("GitHub Secret:", os.getenv('GITHUB_SECRET', 'Not set'))
 
 def profile_required(view_func):
     @wraps(view_func)
